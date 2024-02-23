@@ -17,7 +17,7 @@ export default function SignUp(){
     const isInvalid=password==='' || emailAddress==='' || userName===''||fullName==='';
     const handleSignUp=async (event)=>{
         event.preventDefault();
-        //debugger;
+        debugger;
         const userNameExists=await doesUserNameExist(userName);
         //console.log('User Name exists:'+userNameExists)
         if(userNameExists.length){
