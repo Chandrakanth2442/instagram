@@ -2,25 +2,26 @@ import {Link, useNavigate} from 'react-router-dom'
 import FirebaseContext from '../context/firebase';
 import { useState, useContext, useEffect } from 'react';
 import * as ROUTES from '../constants/routes'
-import { doesUserNameExist } from '../services/firebase';
+import { doesUsernameExist } from '../services/firebase';
 
 export default function SignUp(){
 
-    const history=useNavigate();
+    const navigate=useNavigate();
     const {firebase}=useContext(FirebaseContext)
-    const [userName, setUserName]=useState();
+    const [username, setUsername]=useState();
     const [fullName, setFullName]=useState();
     const [emailAddress, setEmailAddress]=useState();
     const [password, setPassword]=useState();
     const [error, setError]=useState();
 
-    const isInvalid=password==='' || emailAddress==='' || userName===''||fullName==='';
+    const isInvalid=password==='' || emailAddress==='' || username===''||fullName==='';
     const handleSignUp=async (event)=>{
         event.preventDefault();
-        debugger;
-        const userNameExists=await doesUserNameExist(userName);
-        //console.log('User Name exists:'+userNameExists)
-        if(userNameExists.length){
+        //debugger;
+        const usernameExists=await doesUsernameExist(username);
+        console.log('User Name exists:'+usernameExists.username)
+        console.log('User Name exists:'+usernameExists)
+        if(!usernameExists){
             try{
                 const createdUserResult=await firebase
                                         .auth()
@@ -28,23 +29,24 @@ export default function SignUp(){
                     // authentication
                         //-> emailAddress and password and username(displayName)
                     await createdUserResult.user.updateProfile({
-                        displayName: userName
+                        displayName: username
                     })  ;
                     await firebase.firestore().collection('users').add({
                         userId: createdUserResult.user.uid,
-                        userName: userName.toLowerCase(),
+                        username: username.toLowerCase(),
                         fullName,
                         emailAddress: emailAddress.toLowerCase(),
                         following: [],
                         dateCreated: Date.now()
                     }) ;   
-                    history.push(ROUTES.DASHBOARD)    
+                    navigate(ROUTES.DASHBOARD)    
                     }
                     //
             catch(error){
                     setFullName('');
                     setEmailAddress('');
                     setPassword('');
+                    setUsername('');
                     setError(error.message);
             }
         }
@@ -88,12 +90,12 @@ export default function SignUp(){
                     />
                     
                     <input 
-                    aria-label="Enter your Username"
+                    aria-label="Enter your username"
                     type='text'
-                    placeholder='Username'
+                    placeholder='username'
                     className='text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2'
-                    onChange={({ target })=> setUserName(target.value)}
-                    value={userName}
+                    onChange={({ target })=> setUsername(target.value)}
+                    value={username}
                     />
                     <input 
                     aria-label="Enter your password"
